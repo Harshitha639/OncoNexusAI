@@ -40,7 +40,13 @@ class Appointment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[AppointmentStatus] = mapped_column(
-        Enum(AppointmentStatus, name="appointment_status"),
+        Enum(
+            AppointmentStatus,
+            name="appointment_status",
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+        ),
         nullable=False,
         default=AppointmentStatus.SCHEDULED,
     )

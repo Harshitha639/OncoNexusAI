@@ -11,16 +11,26 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.enums import AlcoholConsumption, BloodGroup, Gender, SmokingStatus
+from app.models.enums import (
+    AlcoholConsumption,
+    BloodGroup,
+    Gender,
+    SmokingStatus,
+)
 
 if TYPE_CHECKING:
     from app.models.user import User
 
 
-class PatientProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
-    """Extended profile information for a `patient`-role user.
+def enum_values(enum_class: type) -> list[str]:
+    """Return enum values instead of enum member names for PostgreSQL storage."""
+    return [member.value for member in enum_class]
 
-    One-to-one with `User` — every patient has at most one profile.
+
+class PatientProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
+    """Extended profile information for a patient-role user.
+
+    One-to-one with User — every patient has at most one profile.
     """
 
     __tablename__ = "patient_profiles"
@@ -33,32 +43,103 @@ class PatientProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         index=True,
     )
 
-    date_of_birth: Mapped[date | None] = mapped_column(Date, nullable=True)
-    gender: Mapped[Gender | None] = mapped_column(Enum(Gender, name="gender"), nullable=True)
-    phone_number: Mapped[str | None] = mapped_column(String(32), nullable=True)
-    blood_group: Mapped[BloodGroup | None] = mapped_column(
-        Enum(BloodGroup, name="blood_group"), nullable=True
+    date_of_birth: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
     )
-    height_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
-    weight_kg: Mapped[float | None] = mapped_column(Float, nullable=True)
-    address: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    emergency_contact_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    emergency_contact_phone: Mapped[str | None] = mapped_column(String(32), nullable=True)
-    emergency_contact_relationship: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    gender: Mapped[Gender | None] = mapped_column(
+        Enum(
+            Gender,
+            name="gender",
+            values_callable=enum_values,
+        ),
+        nullable=True,
+    )
 
-    family_history: Mapped[str | None] = mapped_column(Text, nullable=True)
-    allergies: Mapped[str | None] = mapped_column(Text, nullable=True)
-    current_medications: Mapped[str | None] = mapped_column(Text, nullable=True)
+    phone_number: Mapped[str | None] = mapped_column(
+        String(32),
+        nullable=True,
+    )
+
+    blood_group: Mapped[BloodGroup | None] = mapped_column(
+        Enum(
+            BloodGroup,
+            name="blood_group",
+            values_callable=enum_values,
+        ),
+        nullable=True,
+    )
+
+    height_cm: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
+    weight_kg: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
+    address: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    emergency_contact_name: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    emergency_contact_phone: Mapped[str | None] = mapped_column(
+        String(32),
+        nullable=True,
+    )
+
+    emergency_contact_relationship: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    family_history: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    allergies: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    current_medications: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
 
     smoking_status: Mapped[SmokingStatus | None] = mapped_column(
-        Enum(SmokingStatus, name="smoking_status"), nullable=True
+        Enum(
+            SmokingStatus,
+            name="smoking_status",
+            values_callable=enum_values,
+        ),
+        nullable=True,
     )
+
     alcohol_consumption: Mapped[AlcoholConsumption | None] = mapped_column(
-        Enum(AlcoholConsumption, name="alcohol_consumption"), nullable=True
+        Enum(
+            AlcoholConsumption,
+            name="alcohol_consumption",
+            values_callable=enum_values,
+        ),
+        nullable=True,
     )
 
-    user: Mapped["User"] = relationship(back_populates="patient_profile")
+    user: Mapped["User"] = relationship(
+        back_populates="patient_profile",
+    )
 
-    def __repr__(self) -> str:  # pragma: no cover
-        return f"<PatientProfile id={self.id} user_id={self.user_id}>"
+    def __repr__(self) -> str:
+        return (
+            f"<PatientProfile id={self.id} "
+            f"user_id={self.user_id}>"
+        )

@@ -38,7 +38,9 @@ class AuthService:
     async def register(self, payload: RegisterRequest) -> User:
         existing = await self._users.get_by_email(payload.email)
         if existing is not None:
-            raise ConflictException(message="An account with this email already exists.")
+            raise ConflictException(
+                message="An account with this email already exists."
+            )
 
         role = await self._roles.get_by_name(payload.role)
         if role is None:
@@ -55,10 +57,19 @@ class AuthService:
             hashed_password=hash_password(payload.password),
             full_name=payload.full_name,
         )
+
+        # Explicitly load the roles relationship before modifying it.
+        # This prevents SQLAlchemy's MissingGreenlet error.
+        await self._db.refresh(user, attribute_names=["roles"])
+
         user.roles.append(role)
+
         await self._db.flush()
         await self._db.commit()
-        await self._db.refresh(user)
+
+        # Reload roles so they are available when Pydantic creates the response.
+        await self._db.refresh(user, attribute_names=["roles"])
+
         return user
 
     # ------------------------------------------------------------------

@@ -34,6 +34,8 @@ def create_app() -> FastAPI:
     # ------------------------------------------------------------------
     # Middleware (order matters: outermost registered last is run first)
     # ------------------------------------------------------------------
+    app.add_middleware(RequestLoggingMiddleware)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.BACKEND_CORS_ORIGINS,
@@ -41,8 +43,6 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_middleware(RequestLoggingMiddleware)
-
     # ------------------------------------------------------------------
     # Exception handling
     # ------------------------------------------------------------------
