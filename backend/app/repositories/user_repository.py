@@ -22,24 +22,14 @@ class UserRepository:
         result = await self._db.execute(select(User).where(User.email == email.lower()))
         return result.scalar_one_or_none()
 
-    async def create(
-        self,
-        *,
-        email: str,
-        hashed_password: str,
-        full_name: str,
-    ) -> User:
-
+    async def create(self, *, email: str, hashed_password: str, full_name: str) -> User:
         user = User(
             email=email.lower(),
             hashed_password=hashed_password,
             full_name=full_name,
             is_active=True,
             is_verified=False,
-            roles=[],          # <-- IMPORTANT
         )
-
         self._db.add(user)
         await self._db.flush()
-
         return user

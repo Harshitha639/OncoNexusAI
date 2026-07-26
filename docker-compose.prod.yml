@@ -5,7 +5,8 @@ services:
     build:
       context: ./backend
       target: production
-    volumes: []
+    volumes:
+      - report_storage:/app/storage
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
     restart: always
 
@@ -17,3 +18,6 @@ services:
     ports:
       - "80:80"
     restart: always
+
+volumes:
+  report_storage:

@@ -1,7 +1,5 @@
 """Authentication endpoints — register, login, refresh, logout."""
 
-import traceback
-
 from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -39,31 +37,12 @@ async def register(
     db: AsyncSession = Depends(get_db),
 ) -> BaseResponse[UserReadSchema]:
     """Create a new user account with the requested role (defaults to `patient`)."""
-
-    print("\n========== REGISTER REQUEST ==========")
-    print(payload.model_dump())
-
-    try:
-        service = AuthService(db)
-
-        print("Creating user...")
-
-        user = await service.register(payload)
-
-        print("User created successfully!")
-        print(user)
-
-        return BaseResponse(
-            message="Account created successfully.",
-            data=UserReadSchema.model_validate(user),
-        )
-
-    except Exception as e:
-        print("\n========== REGISTER FAILED ==========")
-        traceback.print_exc()
-        print(f"Exception Type: {type(e).__name__}")
-        print(f"Exception: {e}")
-        raise
+    service = AuthService(db)
+    user = await service.register(payload)
+    return BaseResponse(
+        message="Account created successfully.",
+        data=UserReadSchema.model_validate(user),
+    )
 
 
 @router.post(
@@ -81,15 +60,9 @@ async def login(
     service = AuthService(db)
     user_agent, ip_address = _client_meta(request)
     token_pair = await service.login(
-        payload.email,
-        payload.password,
-        user_agent=user_agent,
-        ip_address=ip_address,
+        payload.email, payload.password, user_agent=user_agent, ip_address=ip_address
     )
-    return BaseResponse(
-        message="Login successful.",
-        data=token_pair,
-    )
+    return BaseResponse(message="Login successful.", data=token_pair)
 
 
 @router.post(
@@ -107,14 +80,9 @@ async def refresh(
     service = AuthService(db)
     user_agent, ip_address = _client_meta(request)
     token_pair = await service.refresh(
-        payload.refresh_token,
-        user_agent=user_agent,
-        ip_address=ip_address,
+        payload.refresh_token, user_agent=user_agent, ip_address=ip_address
     )
-    return BaseResponse(
-        message="Token refreshed successfully.",
-        data=token_pair,
-    )
+    return BaseResponse(message="Token refreshed successfully.", data=token_pair)
 
 
 @router.post(
@@ -130,7 +98,4 @@ async def logout(
     """Revoke the given refresh token so it can no longer be used."""
     service = AuthService(db)
     await service.logout(payload.refresh_token)
-    return BaseResponse(
-        message="Logged out successfully.",
-        data=None,
-    )
+    return BaseResponse(message="Logged out successfully.", data=None)

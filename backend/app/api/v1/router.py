@@ -8,14 +8,27 @@ single place that assembles the v1 API surface.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, health, users
+from app.api.v1.endpoints import (
+    appointments,
+    auth,
+    dashboard,
+    health,
+    notifications,
+    patient_profile,
+    reports,
+    users,
+)
 
 api_router = APIRouter()
 
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(users.router)
+api_router.include_router(patient_profile.router)
+api_router.include_router(reports.router)
+api_router.include_router(appointments.router)
+api_router.include_router(notifications.router)
+api_router.include_router(dashboard.router)
 
-# Future routers will be registered here, e.g.:
-# api_router.include_router(patients.router)
-# api_router.include_router(reports.router)
+# Future routers will be registered here (Phase 4): doctor portal, caregiver
+# portal, multi-agent AI, chatbot, nutrition, rehabilitation, analytics.

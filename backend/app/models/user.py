@@ -11,6 +11,7 @@ from app.database.base import Base
 from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from app.models.patient_profile import PatientProfile
     from app.models.refresh_token import RefreshToken
     from app.models.role import Role
 
@@ -34,7 +35,12 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
-        lazy="raise",
+        lazy="selectin",
+    )
+    patient_profile: Mapped["PatientProfile | None"] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
     )
 
     def __repr__(self) -> str:  # pragma: no cover

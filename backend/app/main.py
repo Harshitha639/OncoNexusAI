@@ -56,13 +56,10 @@ def create_app() -> FastAPI:
     # ------------------------------------------------------------------
     # Swagger / OpenAPI customization
     # ------------------------------------------------------------------
-    def custom_openapi():
-        print("\n========== REGISTERED ROUTES ==========")
-        for route in app.routes:
-            print(route.path)
-        print("=======================================\n")
-
-        return get_openapi(
+    def custom_openapi() -> dict:
+        if app.openapi_schema:
+            return app.openapi_schema
+        schema = get_openapi(
             title=settings.PROJECT_NAME,
             version=settings.PROJECT_VERSION,
             description=settings.PROJECT_DESCRIPTION,

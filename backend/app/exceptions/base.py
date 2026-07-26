@@ -50,3 +50,13 @@ class ConflictException(AppException):
 class ServiceUnavailableException(AppException):
     def __init__(self, message: str = "Service temporarily unavailable.", code: str = "service_unavailable") -> None:
         super().__init__(message=message, code=code, status_code=HTTPStatus.SERVICE_UNAVAILABLE)
+
+
+class PayloadTooLargeException(AppException):
+    def __init__(self, message: str = "Uploaded file is too large.", code: str = "payload_too_large") -> None:
+        super().__init__(message=message, code=code, status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+
+
+class UnsupportedMediaTypeException(AppException):
+    def __init__(self, message: str = "Unsupported file type.", code: str = "unsupported_media_type") -> None:
+        super().__init__(message=message, code=code, status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE)

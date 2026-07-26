@@ -2,12 +2,18 @@ import { Route, Routes } from "react-router-dom";
 
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { RootLayout } from "@/layouts/RootLayout";
+import { AppointmentsPage } from "@/pages/AppointmentsPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { ForgotPasswordPage } from "@/pages/ForgotPasswordPage";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { MedicalProfilePage } from "@/pages/MedicalProfilePage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
+import { PatientProfilePage } from "@/pages/PatientProfilePage";
 import { RegisterPage } from "@/pages/RegisterPage";
+import { ReportDetailsPage } from "@/pages/ReportDetailsPage";
+import { ReportHistoryPage } from "@/pages/ReportHistoryPage";
+import { UploadReportPage } from "@/pages/UploadReportPage";
 import { GuestRoute } from "@/routes/GuestRoute";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
@@ -33,6 +39,15 @@ export function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<DashboardPage />} />
+
+          <Route path="profile/patient" element={<PatientProfilePage />} />
+          <Route path="profile/medical" element={<MedicalProfilePage />} />
+
+          <Route path="reports" element={<ReportHistoryPage />} />
+          <Route path="reports/upload" element={<UploadReportPage />} />
+          <Route path="reports/:reportId" element={<ReportDetailsPage />} />
+
+          <Route path="appointments" element={<AppointmentsPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

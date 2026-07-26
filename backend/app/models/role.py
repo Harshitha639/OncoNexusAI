@@ -25,7 +25,7 @@ class Role(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     users: Mapped[list["User"]] = relationship(
         secondary="user_roles",
         back_populates="roles",
-        lazy="raise",
+        lazy="selectin",
     )
 
     def __repr__(self) -> str:  # pragma: no cover

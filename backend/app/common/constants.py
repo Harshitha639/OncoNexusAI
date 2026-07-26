@@ -21,6 +21,9 @@ class ApiTags(str, Enum):
     RISK_ASSESSMENT = "Risk Assessment"
     AGENTS = "AI Agents"
     REHABILITATION = "Rehabilitation"
+    APPOINTMENTS = "Appointments"
+    NOTIFICATIONS = "Notifications"
+    DASHBOARD = "Dashboard"
 
 
 class ResponseStatus(str, Enum):

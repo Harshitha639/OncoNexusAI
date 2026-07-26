@@ -55,19 +55,10 @@ class AuthService:
             hashed_password=hash_password(payload.password),
             full_name=payload.full_name,
         )
-        from app.models.user_role import UserRole
-
-        self._db.add(
-            UserRole(
-                user_id=user.id,
-                role_id=role.id,
-            )
-        )
-
+        user.roles.append(role)
+        await self._db.flush()
         await self._db.commit()
-
-        user = await self._users.get_by_id(user.id)
-
+        await self._db.refresh(user)
         return user
 
     # ------------------------------------------------------------------

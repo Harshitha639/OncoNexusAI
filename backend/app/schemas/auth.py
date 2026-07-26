@@ -4,14 +4,7 @@ import re
 import uuid
 from datetime import datetime
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    EmailStr,
-    Field,
-    field_validator,
-    field_serializer,
-)
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models.enums import RoleName
 
@@ -72,18 +65,22 @@ class TokenPairResponse(BaseModel):
     expires_at: datetime
 
 
-
 class UserReadSchema(BaseModel):
+    """Public-facing representation of a `User`."""
+
     id: uuid.UUID
     email: EmailStr
     full_name: str
     is_active: bool
     is_verified: bool
-    roles: list
+    roles: list[str]
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = {"from_attributes": True}
 
-    @field_serializer("roles")
-    def serialize_roles(self, roles):
-        return [role.name for role in roles]
+    @field_validator("roles", mode="before")
+    @classmethod
+    def coerce_roles(cls, value: object) -> list[str]:
+        if value and hasattr(value, "__iter__") and not isinstance(value, (str, list)):
+            return [getattr(role, "name", role) for role in value]
+        return value  # type: ignore[return-value]

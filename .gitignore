@@ -10,6 +10,8 @@ venv/
 *.sqlite3
 backend/.env
 backend/data/
+backend/storage/
+backend/.test_storage/
 
 # ---- Node / Frontend ----
 node_modules/

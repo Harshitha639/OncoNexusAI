@@ -18,11 +18,39 @@
     --radius: 0.5rem;
   }
 
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 96%;
+    --primary: 199 89% 55%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 168 70% 45%;
+    --secondary-foreground: 222 47% 8%;
+    --muted: 222 40% 15%;
+    --muted-foreground: 215 20% 65%;
+    --destructive: 0 65% 60%;
+    --destructive-foreground: 222 47% 8%;
+    --border: 222 30% 22%;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased transition-colors duration-200;
   }
 }
+
+@layer utilities {
+  /* Glassmorphism surface used by dashboard/report cards throughout Phase 3. */
+  .glass-card {
+    @apply rounded-2xl border border-white/20 bg-white/60 shadow-lg backdrop-blur-xl;
+    @apply dark:border-white/10 dark:bg-white/5;
+  }
+
+  .glass-panel {
+    @apply rounded-2xl border border-white/30 bg-white/40 backdrop-blur-2xl;
+    @apply dark:border-white/10 dark:bg-white/[0.03];
+  }
+}
+

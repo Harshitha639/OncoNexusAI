@@ -54,12 +54,7 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # CORS
     # ------------------------------------------------------------------
-    BACKEND_CORS_ORIGINS: List[str] = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-]
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
@@ -106,6 +101,23 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str = ""
     VECTOR_STORE_DIR: str = "./data/vector_store"
     TRAINED_MODELS_DIR: str = "../trained_models"
+
+    # ------------------------------------------------------------------
+    # Gemini (AI report summarization — Phase 3)
+    # ------------------------------------------------------------------
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+
+    # ------------------------------------------------------------------
+    # File uploads — medical reports (Phase 3)
+    # ------------------------------------------------------------------
+    UPLOAD_DIR: str = "./storage/reports"
+    MAX_UPLOAD_SIZE_MB: int = 20
+    ALLOWED_REPORT_EXTENSIONS: List[str] = [".pdf", ".jpg", ".jpeg", ".png"]
+
+    @property
+    def MAX_UPLOAD_SIZE_BYTES(self) -> int:
+        return self.MAX_UPLOAD_SIZE_MB * 1024 * 1024
 
 
 @lru_cache

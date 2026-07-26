@@ -18,7 +18,17 @@ from app.core.config import settings
 from app.database.base import Base
 from app.database.session import get_db
 from app.main import app
-from app.models import RefreshToken, Role, User, UserRole  # noqa: F401
+from app.models import (  # noqa: F401
+    Appointment,
+    MedicalReport,
+    Notification,
+    PatientProfile,
+    RefreshToken,
+    ReportAnalysis,
+    Role,
+    User,
+    UserRole,
+)
 from app.models.enums import RoleName
 
 _test_engine = create_async_engine(settings.DATABASE_URL, pool_pre_ping=True)

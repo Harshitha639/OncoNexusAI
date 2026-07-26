@@ -26,7 +26,8 @@
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.6.0",
     "lucide-react": "^0.469.0",
-    "class-variance-authority": "^0.7.1"
+    "class-variance-authority": "^0.7.1",
+    "react-hot-toast": "^2.4.1"
   },
   "devDependencies": {
     "@types/react": "^19.0.2",
