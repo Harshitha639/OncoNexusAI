@@ -7,7 +7,12 @@ transaction that is rolled back afterwards, so tests never leak state
 into one another and never require manual cleanup.
 """
 
+import asyncio
+import sys
 import uuid
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 import pytest
 from httpx import ASGITransport, AsyncClient
