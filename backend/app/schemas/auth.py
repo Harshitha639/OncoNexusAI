@@ -81,15 +81,6 @@ class UserReadSchema(BaseModel):
     @field_validator("roles", mode="before")
     @classmethod
     def coerce_roles(cls, value: object) -> list[str]:
-        if value is None:
-            return []
-
-        if isinstance(value, (list, tuple, set)):
-            return [
-                role.name.value
-                if hasattr(role, "name") and hasattr(role.name, "value")
-                else str(getattr(role, "name", role))
-                for role in value
-            ]
-
-        return [str(value)]
+        if value and hasattr(value, "__iter__") and not isinstance(value, (str, list)):
+            return [getattr(role, "name", role) for role in value]
+        return value  # type: ignore[return-value]

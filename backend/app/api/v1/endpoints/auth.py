@@ -26,6 +26,26 @@ def _client_meta(request: Request) -> tuple[str | None, str | None]:
     return user_agent, ip_address
 
 
+def _to_user_read_schema(user) -> UserReadSchema:
+    """Convert a User ORM model into the API response schema."""
+
+    role_names = [
+        role.name.value if hasattr(role.name, "value") else str(role.name)
+        for role in user.roles
+    ]
+
+    return UserReadSchema(
+        id=user.id,
+        email=user.email,
+        full_name=user.full_name,
+        is_active=user.is_active,
+        roles=role_names,
+        is_verified=user.is_verified,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+    )
+
+
 @router.post(
     "/register",
     response_model=BaseResponse[UserReadSchema],
@@ -36,12 +56,14 @@ async def register(
     payload: RegisterRequest,
     db: AsyncSession = Depends(get_db),
 ) -> BaseResponse[UserReadSchema]:
-    """Create a new user account with the requested role (defaults to `patient`)."""
+    """Create a new user account with the requested role."""
+
     service = AuthService(db)
     user = await service.register(payload)
+
     return BaseResponse(
         message="Account created successfully.",
-        data=UserReadSchema.model_validate(user),
+        data=_to_user_read_schema(user),
     )
 
 
@@ -56,13 +78,22 @@ async def login(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> BaseResponse[TokenPairResponse]:
-    """Authenticate with email + password and receive a JWT token pair."""
+    """Authenticate with email and password and receive a JWT token pair."""
+
     service = AuthService(db)
     user_agent, ip_address = _client_meta(request)
+
     token_pair = await service.login(
-        payload.email, payload.password, user_agent=user_agent, ip_address=ip_address
+        payload.email,
+        payload.password,
+        user_agent=user_agent,
+        ip_address=ip_address,
     )
-    return BaseResponse(message="Login successful.", data=token_pair)
+
+    return BaseResponse(
+        message="Login successful.",
+        data=token_pair,
+    )
 
 
 @router.post(
@@ -77,25 +108,38 @@ async def refresh(
     db: AsyncSession = Depends(get_db),
 ) -> BaseResponse[TokenPairResponse]:
     """Rotate the given refresh token for a new access/refresh token pair."""
+
     service = AuthService(db)
     user_agent, ip_address = _client_meta(request)
+
     token_pair = await service.refresh(
-        payload.refresh_token, user_agent=user_agent, ip_address=ip_address
+        payload.refresh_token,
+        user_agent=user_agent,
+        ip_address=ip_address,
     )
-    return BaseResponse(message="Token refreshed successfully.", data=token_pair)
+
+    return BaseResponse(
+        message="Token refreshed successfully.",
+        data=token_pair,
+    )
 
 
 @router.post(
     "/logout",
     response_model=BaseResponse[None],
     status_code=status.HTTP_200_OK,
-    summary="Revoke a refresh token (logout)",
+    summary="Revoke a refresh token",
 )
 async def logout(
     payload: LogoutRequest,
     db: AsyncSession = Depends(get_db),
 ) -> BaseResponse[None]:
     """Revoke the given refresh token so it can no longer be used."""
+
     service = AuthService(db)
     await service.logout(payload.refresh_token)
-    return BaseResponse(message="Logged out successfully.", data=None)
+
+    return BaseResponse(
+        message="Logged out successfully.",
+        data=None,
+    )

@@ -46,3 +46,5 @@ logs/
 
 # ---- Docker ----
 docker-compose.override.yml
+
+backend/test_gemini.py

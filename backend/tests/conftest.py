@@ -25,6 +25,7 @@ from app.models import (  # noqa: F401
     PatientProfile,
     RefreshToken,
     ReportAnalysis,
+    ReportGuidance,
     Role,
     User,
     UserRole,

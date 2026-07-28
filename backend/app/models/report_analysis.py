@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Enum, Float, ForeignKey, String, Text
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy import Float, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class ReportAnalysis(Base, UUIDPrimaryKeyMixin, TimestampMixin):
-    """AI-generated (Gemini) structured analysis of a single MedicalReport."""
+    """AI-generated structured analysis of a single medical report."""
 
     __tablename__ = "report_analyses"
 
@@ -31,12 +32,13 @@ class ReportAnalysis(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     status: Mapped[AiSummaryStatus] = mapped_column(
-        Enum(
+        SAEnum(
             AiSummaryStatus,
             name="ai_summary_status",
             values_callable=lambda enum_cls: [
                 member.value for member in enum_cls
             ],
+            create_type=False,
         ),
         nullable=False,
         default=AiSummaryStatus.PENDING,
@@ -108,7 +110,7 @@ class ReportAnalysis(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     report: Mapped["MedicalReport"] = relationship(
-        back_populates="analysis"
+        back_populates="analysis",
     )
 
     def __repr__(self) -> str:

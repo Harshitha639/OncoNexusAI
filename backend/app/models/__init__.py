@@ -6,6 +6,7 @@ from app.models.notification import Notification
 from app.models.patient_profile import PatientProfile
 from app.models.refresh_token import RefreshToken
 from app.models.report_analysis import ReportAnalysis
+from app.models.report_guidance import ReportGuidance
 from app.models.role import Role
 from app.models.user import User
 from app.models.user_role import UserRole
@@ -21,6 +22,7 @@ __all__ = [
     "PatientProfile",
     "MedicalReport",
     "ReportAnalysis",
+    "ReportGuidance",
     "Appointment",
     "Notification",
 ]

@@ -32,35 +32,11 @@ NOTIFICATION_TYPE = (
 def upgrade() -> None:
     bind = op.get_bind()
 
-    report_file_type_enum = postgresql.ENUM(
-        *REPORT_FILE_TYPE,
-        name="report_file_type",
-        create_type=False,
-    )
-
-    ocr_status_enum = postgresql.ENUM(
-        *OCR_STATUS,
-        name="ocr_status",
-        create_type=False,
-    )
-
-    ai_summary_status_enum = postgresql.ENUM(
-        *AI_SUMMARY_STATUS,
-        name="ai_summary_status",
-        create_type=False,
-    )
-
-    appointment_status_enum = postgresql.ENUM(
-        *APPOINTMENT_STATUS,
-        name="appointment_status",
-        create_type=False,
-    )
-
-    notification_type_enum = postgresql.ENUM(
-        *NOTIFICATION_TYPE,
-        name="notification_type",
-        create_type=False,
-    )
+    report_file_type_enum = postgresql.ENUM(*REPORT_FILE_TYPE, name="report_file_type")
+    ocr_status_enum = postgresql.ENUM(*OCR_STATUS, name="ocr_status")
+    ai_summary_status_enum = postgresql.ENUM(*AI_SUMMARY_STATUS, name="ai_summary_status")
+    appointment_status_enum = postgresql.ENUM(*APPOINTMENT_STATUS, name="appointment_status")
+    notification_type_enum = postgresql.ENUM(*NOTIFICATION_TYPE, name="notification_type")
 
     report_file_type_enum.create(bind, checkfirst=True)
     ocr_status_enum.create(bind, checkfirst=True)

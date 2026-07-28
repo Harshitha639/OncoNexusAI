@@ -24,29 +24,10 @@ ALCOHOL_CONSUMPTION = ("never", "occasional", "regular", "frequent")
 
 
 def upgrade() -> None:
-    gender_enum = postgresql.ENUM(
-        *GENDER,
-        name="gender",
-        create_type=False,
-    )
-
-    blood_group_enum = postgresql.ENUM(
-        *BLOOD_GROUP,
-        name="blood_group",
-        create_type=False,
-    )
-
-    smoking_status_enum = postgresql.ENUM(
-        *SMOKING_STATUS,
-        name="smoking_status",
-        create_type=False,
-    )
-
-    alcohol_consumption_enum = postgresql.ENUM(
-        *ALCOHOL_CONSUMPTION,
-        name="alcohol_consumption",
-        create_type=False,
-    )
+    gender_enum = postgresql.ENUM(*GENDER, name="gender")
+    blood_group_enum = postgresql.ENUM(*BLOOD_GROUP, name="blood_group")
+    smoking_status_enum = postgresql.ENUM(*SMOKING_STATUS, name="smoking_status")
+    alcohol_consumption_enum = postgresql.ENUM(*ALCOHOL_CONSUMPTION, name="alcohol_consumption")
 
     bind = op.get_bind()
     gender_enum.create(bind, checkfirst=True)

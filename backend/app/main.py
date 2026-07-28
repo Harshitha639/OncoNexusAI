@@ -2,7 +2,7 @@
 Application entrypoint and FastAPI app factory.
 
 Run locally with:
-    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 """
 
 from fastapi import FastAPI
@@ -32,13 +32,19 @@ def create_app() -> FastAPI:
     )
 
     # ------------------------------------------------------------------
-    # Middleware (order matters: outermost registered last is run first)
+    # Middleware
+    # The middleware registered last becomes the outermost middleware.
+    # Register CORS last so even error responses contain CORS headers.
     # ------------------------------------------------------------------
+
     app.add_middleware(RequestLoggingMiddleware)
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_origins=[
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -49,9 +55,12 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
 
     # ------------------------------------------------------------------
-    # Routing (versioned)
+    # Routing
     # ------------------------------------------------------------------
-    app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+    app.include_router(
+        api_router,
+        prefix=settings.API_V1_PREFIX,
+    )
 
     # ------------------------------------------------------------------
     # Swagger / OpenAPI customization
@@ -59,21 +68,35 @@ def create_app() -> FastAPI:
     def custom_openapi() -> dict:
         if app.openapi_schema:
             return app.openapi_schema
+
         schema = get_openapi(
             title=settings.PROJECT_NAME,
             version=settings.PROJECT_VERSION,
             description=settings.PROJECT_DESCRIPTION,
             routes=app.routes,
         )
-        schema["info"]["x-logo"] = {"url": "https://placehold.co/200x60?text=OncoNexus+AI"}
-        schema["components"]["securitySchemes"] = {
-            "BearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
+
+        schema["info"]["x-logo"] = {
+            "url": "https://placehold.co/200x60?text=OncoNexus+AI"
         }
+
+        schema.setdefault("components", {})
+        schema["components"]["securitySchemes"] = {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+        }
+
         app.openapi_schema = schema
         return app.openapi_schema
 
     app.openapi = custom_openapi  # type: ignore[method-assign]
 
+    # ------------------------------------------------------------------
+    # Lifecycle events
+    # ------------------------------------------------------------------
     @app.on_event("startup")
     async def on_startup() -> None:
         logger.info(
@@ -85,7 +108,10 @@ def create_app() -> FastAPI:
 
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
-        logger.info("%s shutting down.", settings.PROJECT_NAME)
+        logger.info(
+            "%s shutting down.",
+            settings.PROJECT_NAME,
+        )
 
     return app
 

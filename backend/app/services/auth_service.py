@@ -52,23 +52,21 @@ class AuthService:
                 code="role_not_configured",
             )
 
-        user = await self._users.create(
+        user = User(
             email=payload.email,
             hashed_password=hash_password(payload.password),
             full_name=payload.full_name,
+            roles=[role],
         )
 
-        # Explicitly load the roles relationship before modifying it.
-        # This prevents SQLAlchemy's MissingGreenlet error.
-        await self._db.refresh(user, attribute_names=["roles"])
-
-        user.roles.append(role)
-
+        self._db.add(user)
         await self._db.flush()
         await self._db.commit()
 
-        # Reload roles so they are available when Pydantic creates the response.
-        await self._db.refresh(user, attribute_names=["roles"])
+        await self._db.refresh(
+            user,
+            attribute_names=["roles"],
+        )
 
         return user
 

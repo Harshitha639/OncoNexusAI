@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, Enum, Float, ForeignKey, String, Text
+from sqlalchemy import Date, Enum as SAEnum, Float, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -20,11 +20,6 @@ from app.models.enums import (
 
 if TYPE_CHECKING:
     from app.models.user import User
-
-
-def enum_values(enum_class: type) -> list[str]:
-    """Return enum values instead of enum member names for PostgreSQL storage."""
-    return [member.value for member in enum_class]
 
 
 class PatientProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -49,10 +44,13 @@ class PatientProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     gender: Mapped[Gender | None] = mapped_column(
-        Enum(
+        SAEnum(
             Gender,
             name="gender",
-            values_callable=enum_values,
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+            create_type=False,
         ),
         nullable=True,
     )
@@ -63,10 +61,13 @@ class PatientProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     blood_group: Mapped[BloodGroup | None] = mapped_column(
-        Enum(
+        SAEnum(
             BloodGroup,
             name="blood_group",
-            values_callable=enum_values,
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+            create_type=False,
         ),
         nullable=True,
     )
@@ -117,19 +118,25 @@ class PatientProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     smoking_status: Mapped[SmokingStatus | None] = mapped_column(
-        Enum(
+        SAEnum(
             SmokingStatus,
             name="smoking_status",
-            values_callable=enum_values,
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+            create_type=False,
         ),
         nullable=True,
     )
 
     alcohol_consumption: Mapped[AlcoholConsumption | None] = mapped_column(
-        Enum(
+        SAEnum(
             AlcoholConsumption,
             name="alcohol_consumption",
-            values_callable=enum_values,
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+            create_type=False,
         ),
         nullable=True,
     )

@@ -12,6 +12,7 @@ from app.api.v1.endpoints import (
     appointments,
     auth,
     dashboard,
+    guidance,
     health,
     notifications,
     patient_profile,
@@ -26,9 +27,10 @@ api_router.include_router(auth.router)
 api_router.include_router(users.router)
 api_router.include_router(patient_profile.router)
 api_router.include_router(reports.router)
+api_router.include_router(guidance.router)
 api_router.include_router(appointments.router)
 api_router.include_router(notifications.router)
 api_router.include_router(dashboard.router)
 
-# Future routers will be registered here (Phase 4): doctor portal, caregiver
-# portal, multi-agent AI, chatbot, nutrition, rehabilitation, analytics.
+# Future routers will be registered here (Phase 4+): doctor portal, caregiver
+# portal, chatbot, nutrition, rehabilitation, analytics.

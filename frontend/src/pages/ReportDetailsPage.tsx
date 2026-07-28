@@ -8,6 +8,7 @@ import { FullPageSpinner } from "@/components/common/Spinner";
 import { Badge, type BadgeVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { GuidanceTabs } from "@/components/guidance/GuidanceTabs";
 import { fetchReportDetail, fetchReportSummary, generateReportSummary } from "@/services/reportService";
 import { getApiErrorMessage } from "@/utils/apiError";
 import type { OcrStatus } from "@/types/report";
@@ -274,6 +275,9 @@ export function ReportDetailsPage() {
           )}
         </Card>
       </div>
+
+      {/* Phase 4 — Personalized Guidance & Caregiver Support agents */}
+      <GuidanceTabs reportId={reportId as string} canGenerate={summary?.status === "completed"} />
     </div>
   );
 }

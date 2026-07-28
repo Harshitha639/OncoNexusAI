@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import BigInteger, Enum, ForeignKey, String, Text
+from sqlalchemy import BigInteger, Enum as SAEnum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,11 +15,6 @@ from app.models.enums import OcrStatus, ReportFileType
 if TYPE_CHECKING:
     from app.models.report_analysis import ReportAnalysis
     from app.models.user import User
-
-
-def enum_values(enum_class: type) -> list[str]:
-    """Return enum values instead of enum member names for PostgreSQL."""
-    return [member.value for member in enum_class]
 
 
 class MedicalReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -61,10 +56,13 @@ class MedicalReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     file_type: Mapped[ReportFileType] = mapped_column(
-        Enum(
+        SAEnum(
             ReportFileType,
             name="report_file_type",
-            values_callable=enum_values,
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+            create_type=False,
         ),
         nullable=False,
     )
@@ -80,10 +78,13 @@ class MedicalReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     ocr_status: Mapped[OcrStatus] = mapped_column(
-        Enum(
+        SAEnum(
             OcrStatus,
             name="ocr_status",
-            values_callable=enum_values,
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+            create_type=False,
         ),
         nullable=False,
         default=OcrStatus.PENDING,

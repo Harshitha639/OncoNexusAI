@@ -38,7 +38,7 @@ pdfplumber==0.11.4
 easyocr==1.7.2
 
 # ---- AI report summarization (Phase 3) ----
-google-generativeai==0.8.3
+google-genai==0.8.3
 
 # ---- Utilities ----
 python-dotenv==1.0.1

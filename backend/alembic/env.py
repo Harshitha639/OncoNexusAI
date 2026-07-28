@@ -14,7 +14,18 @@ from app.database.base import Base
 
 # Import all models here so they are registered on Base.metadata
 # before autogenerate compares against it.
-from app.models import RefreshToken, Role, User, UserRole  # noqa: F401,E402
+from app.models import (  # noqa: F401,E402
+    Appointment,
+    MedicalReport,
+    Notification,
+    PatientProfile,
+    RefreshToken,
+    ReportAnalysis,
+    ReportGuidance,
+    Role,
+    User,
+    UserRole,
+)
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SYNC)

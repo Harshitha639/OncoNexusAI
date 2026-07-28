@@ -76,3 +76,10 @@ class NotificationType(str, enum.Enum):
     MEDICATION_REMINDER = "medication_reminder"
     REPORT_UPLOAD_SUCCESS = "report_upload_success"
     GENERAL = "general"
+
+
+class GuidanceType(str, enum.Enum):
+    """Which of the two Phase 4 agents a `ReportGuidance` row belongs to."""
+
+    PATIENT_GUIDANCE = "patient_guidance"
+    CAREGIVER_GUIDANCE = "caregiver_guidance"

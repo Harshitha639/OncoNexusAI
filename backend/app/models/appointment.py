@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import DateTime, Enum as SAEnum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -34,18 +34,39 @@ class Appointment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         index=True,
     )
 
-    doctor_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    department: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    doctor_name: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    department: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    scheduled_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+
+    reason: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    notes: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
     status: Mapped[AppointmentStatus] = mapped_column(
-        Enum(
+        SAEnum(
             AppointmentStatus,
             name="appointment_status",
             values_callable=lambda enum_cls: [
                 member.value for member in enum_cls
             ],
+            create_type=False,
         ),
         nullable=False,
         default=AppointmentStatus.SCHEDULED,
@@ -53,5 +74,9 @@ class Appointment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     patient: Mapped["User"] = relationship()
 
-    def __repr__(self) -> str:  # pragma: no cover
-        return f"<Appointment id={self.id} patient_id={self.patient_id} status={self.status}>"
+    def __repr__(self) -> str:
+        return (
+            f"<Appointment id={self.id} "
+            f"patient_id={self.patient_id} "
+            f"status={self.status}>"
+        )
