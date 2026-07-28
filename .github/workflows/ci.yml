@@ -10,9 +10,31 @@ jobs:
   backend:
     name: Backend — Lint & Test
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: onconexus_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d onconexus_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     defaults:
       run:
         working-directory: backend
+
+    env:
+      ENVIRONMENT: test
+      SECRET_KEY: ci-test-secret
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/onconexus_test
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,24 +48,23 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Lint (flake8)
+      - name: Lint with flake8
         run: flake8 app --max-line-length=100 || true
 
-      - name: Type check (mypy)
+      - name: Type check with mypy
         run: mypy app || true
 
       - name: Run tests
-        env:
-          ENVIRONMENT: test
-          SECRET_KEY: ci-test-secret
         run: pytest -v
 
   frontend:
     name: Frontend — Lint & Build
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: frontend
+
     steps:
       - uses: actions/checkout@v4
 
@@ -52,10 +73,10 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: frontend/package.json
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Lint
         run: npm run lint || true
