@@ -3,7 +3,7 @@
 import pytest
 
 REGISTER_PAYLOAD = {
-    "email": "profile.patient@onconexus.test",
+    "email": "profile.patient@example.com",
     "password": "Password123",
     "full_name": "Profile Patient",
     "role": "patient",
@@ -11,12 +11,22 @@ REGISTER_PAYLOAD = {
 
 
 async def _authed_headers(client) -> dict[str, str]:
-    await client.post("/api/v1/auth/register", json=REGISTER_PAYLOAD)
-    login = await client.post(
-        "/api/v1/auth/login",
-        json={"email": REGISTER_PAYLOAD["email"], "password": REGISTER_PAYLOAD["password"]},
+    register_response = await client.post(
+        "/api/v1/auth/register",
+        json=REGISTER_PAYLOAD,
     )
-    token = login.json()["data"]["access_token"]
+    assert register_response.status_code == 201, register_response.text
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": REGISTER_PAYLOAD["email"],
+            "password": REGISTER_PAYLOAD["password"],
+        },
+    )
+    assert login_response.status_code == 200, login_response.text
+
+    token = login_response.json()["data"]["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
 

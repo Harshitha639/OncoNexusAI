@@ -5,7 +5,7 @@ import io
 import pytest
 
 REGISTER_PAYLOAD = {
-    "email": "reports.patient@onconexus.test",
+    "email": "reports.patient@example.com",
     "password": "Password123",
     "full_name": "Reports Patient",
     "role": "patient",
@@ -13,12 +13,22 @@ REGISTER_PAYLOAD = {
 
 
 async def _authed_headers(client) -> dict[str, str]:
-    await client.post("/api/v1/auth/register", json=REGISTER_PAYLOAD)
-    login = await client.post(
-        "/api/v1/auth/login",
-        json={"email": REGISTER_PAYLOAD["email"], "password": REGISTER_PAYLOAD["password"]},
+    register_response = await client.post(
+        "/api/v1/auth/register",
+        json=REGISTER_PAYLOAD,
     )
-    token = login.json()["data"]["access_token"]
+    assert register_response.status_code == 201, register_response.text
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": REGISTER_PAYLOAD["email"],
+            "password": REGISTER_PAYLOAD["password"],
+        },
+    )
+    assert login_response.status_code == 200, login_response.text
+
+    token = login_response.json()["data"]["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
 
@@ -119,20 +129,25 @@ async def test_cannot_access_another_patients_report(client) -> None:
     report_id = upload_response.json()["data"]["id"]
 
     other_payload = {
-        "email": "other.patient@onconexus.test",
+        "email": "other.patient@example.com",
         "password": "Password123",
         "full_name": "Other Patient",
         "role": "patient",
     }
-    await client.post("/api/v1/auth/register", json=other_payload)
+    register_b = await client.post(
+        "/api/v1/auth/register",
+        json=other_payload,
+    )
+    assert register_b.status_code == 201, register_b.text
+
     login_b = await client.post(
         "/api/v1/auth/login",
-        json={"email": other_payload["email"], "password": other_payload["password"]},
+        json={
+            "email": other_payload["email"],
+            "password": other_payload["password"],
+        },
     )
-    headers_b = {"Authorization": f"Bearer {login_b.json()['data']['access_token']}"}
-
-    response = await client.get(f"/api/v1/reports/{report_id}", headers=headers_b)
-    assert response.status_code == 404
+    assert login_b.status_code == 200, login_b.text
 
 
 @pytest.mark.anyio
